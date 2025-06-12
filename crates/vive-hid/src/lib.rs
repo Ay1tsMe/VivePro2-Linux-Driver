@@ -143,11 +143,24 @@ const VIVE_COSMOS_PID: u16 = 0x0313;
 
 #[derive(Deserialize, Debug)]
 pub struct ViveConfig {
-	pub device: ConfigDevice,
-	pub direct_mode_edid_pid: u32,
-	pub direct_mode_edid_vid: u32,
-	pub seconds_from_photons_to_vblank: f64,
-	pub seconds_from_vsync_to_photons: f64,
+	//pub device: ConfigDevice,
+	//pub direct_mode_edid_pid: u32,
+	//pub direct_mode_edid_vid: u32,
+	//pub seconds_from_photons_to_vblank: f64,
+	//pub seconds_from_vsync_to_photons: f64,
+
+	// Vive Pro 2 → “direct_mode_edid_*”
+    // Vive Cosmos → “device_*”
+    #[serde(rename = "direct_mode_edid_pid", alias = "device_pid")]
+    pub direct_mode_edid_pid: u32,
+    #[serde(rename = "direct_mode_edid_vid", alias = "device_vid")]
+    pub direct_mode_edid_vid: u32,
+
+    // Cosmos firmwares omit these; give them harmless defaults.
+    #[serde(default)]
+    pub seconds_from_photons_to_vblank: f64,
+    #[serde(default)]
+    pub seconds_from_vsync_to_photons: f64,
 	/// Lets threat it as something opaque, anyway we directly feed this to lens-client
 	pub inhouse_lens_correction: Value,
 }
@@ -382,9 +395,12 @@ impl ViveCosmosDevice {
 		let mut config = String::new();
 		dec.read_to_string(&mut config)?;
 
-        info!("config: {config}");
+        info!("cosmos config: {config}");
 
-		serde_json::from_str(&config).map_err(|_| Error::ConfigReadFailed)
+		serde_json::from_str(&config).map_err(|e| {
+			info!("cosmos: serde-json error: {e:?}");
+			Error::ConfigReadFailed
+		})
     }
     pub fn read_stream(&self, filename: &[u8]) -> Result<Vec::<u8>> {
         let mut report = [0u8; 65];

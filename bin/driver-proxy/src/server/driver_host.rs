@@ -7,7 +7,7 @@ use std::ffi::{CStr, OsString};
 use std::os::raw::c_char;
 use std::process::Command;
 use std::rc::Rc;
-use tracing::{error, info, warn};
+use tracing::{error, info, warn, debug, trace};
 use vive_hid::{SteamDevice, ViveCosmosDevice};
 
 use crate::driver_context::DRIVER_CONTEXT;
@@ -46,6 +46,7 @@ impl IVRServerDriverHost for DriverHost {
 				// Steam part is opened for checking if this is really a needed HMD device
 				let _steam = Rc::new(SteamDevice::open(&sn)?);
 				// We don't know for sure this device serial
+				info!("Opening Cosmos HID interface (vid 0x0bb4, pid 0x0313)");
 				let vive = Rc::new(ViveCosmosDevice::open_first()?);
 
 				let mode = {
