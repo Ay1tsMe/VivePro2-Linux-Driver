@@ -16,7 +16,7 @@ use openvr::{
 	HmdVector2_t, IVRProperties, PropertyWrite_t,
 };
 use tracing::{error, info, instrument};
-use vive_hid::{Mode, ViveConfig, ViveDevice};
+use vive_hid::{Mode, ViveConfig, ViveCosmosDevice};
 
 use crate::openvr::{
 	DistortionCoordinates_t, DriverPose_t, EVREye, EVRInitError, ITrackedDeviceServerDriver,
@@ -157,7 +157,7 @@ impl IVRDisplayComponent for HmdDisplay {
 
 #[impl_vtables(ITrackedDeviceServerDriver)]
 pub struct HmdDriver {
-	pub vive: Rc<ViveDevice>,
+	pub vive: Rc<ViveCosmosDevice>,
 	pub vive_config: ViveConfig,
 	pub lens: Rc<dyn LensClient>,
 	pub real: &'static VtableRef<ITrackedDeviceServerDriverVtable>,
